@@ -1,11 +1,11 @@
 import routerx from 'express-promise-router';
-import usuarioController from '../controllers/UsuarioController';
+import contactoController from '../controllers/ContactoController';
 import auth from '../middlewares/auth';
 const router=routerx();
 
-router.post('/createOne',auth.verifyAdministrador,usuarioController.add);
-router.get('/getAll',auth.verifyUsuario,usuarioController.query);
+router.post('/createOne',auth.verifyUser,contactoController.createOne);
+router.get('/getAll',auth.verifyUser,contactoController.getAll);
 //router.get('/list',auth.verifyAdministrador,usuarioController.list);
-router.put('/updateOne',auth.verifyAdministrador,usuarioController.update);
-router.delete('/deleteOne',auth.verifyAdministrador,usuarioController.remove);
+router.put('/updateOne:id',auth.verifyUser,contactoController.updateOne);
+router.delete('/deleteOne:id',auth.verifyUser,contactoController.deleteOne);
 export default router;

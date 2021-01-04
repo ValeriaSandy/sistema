@@ -47,11 +47,11 @@ export default {
     update: async (req,res,next) => {
         try {
             let pas = req.body.password;
-            const reg0 = await models.Usuario.findOne({_id:req.body._id});
+            const reg0 = await models.Usuario.findOne({_id:req.params.id});
             if (pas!=reg0.password){
                 req.body.password = await bcrypt.hash(req.body.password,10); 
             }                 
-            const reg = await models.Usuario.findByIdAndUpdate({_id:req.body._id},
+            const reg = await models.Usuario.findByIdAndUpdate({_id:req.params.id},
                                                                {rol:req.body.rol,
                                                                 nombres:req.body.nombres,
                                                                 apellidos:req.body.apellidos,
@@ -68,7 +68,7 @@ export default {
     },
     remove: async (req,res,next) => {
         try {
-            const reg = await models.Usuario.findByIdAndDelete({_id:req.body._id});
+            const reg = await models.Usuario.findByIdAndDelete({_id:req.params.id});
             res.status(200).json(reg);
         } catch(e){
             res.status(500).send({
@@ -105,7 +105,7 @@ export default {
             if (user){
                 let match = await bcrypt.compare(req.body.password,user.password);
                 if (match){
-                    let tokenReturn = await token.encode(user._id);
+                    let tokenReturn = await token.encode(user._id,user.rol,user.email);
                     res.status(200).json({user,tokenReturn});
                 } else{
                     res.status(404).send({

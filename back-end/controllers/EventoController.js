@@ -1,8 +1,10 @@
 import models from '../models';
+import token from '../services/token';
 export default {
-    getAll:async (req, res) => {
-        let usuarioId = req.usuario._id;     
+    getAll:async (req, res) => {    
           try {
+            let usuario = await token.decode(req.headers.token);
+            let usuarioId = usuario.id  
             const eventoDB = await models.Evento.find({usuarioId});
             return res.json(eventoDB);
           } catch (error) {
@@ -15,9 +17,10 @@ export default {
 
     createOne: async (req, res) => {
        try{
-          const {nombre, detalle, inicio, final, color}=req.body; 
-          const usuarioId = req.usuario._id
-          const Newevento = new models.Nota({nombre,detalle,inicio,final,color,usuarioId});
+          const {name, details, start, end, color}=req.body; 
+          let usuario = await token.decode(req.headers.token);
+          let usuarioId = usuario.id;
+          const Newevento = new models.Evento({name,details,start,end,color,usuarioId});
           await Newevento.save();
           return res.json(Newevento);       
          } catch (error) {
@@ -28,7 +31,7 @@ export default {
         }
         },
     updateOne: async (req, res) => {
-          const { _id } = req.params;
+          const  _id = req.params.id;
           const body = req.body;
        try {
           const eventoUpdated = await models.Evento.findByIdAndUpdate(
@@ -44,9 +47,9 @@ export default {
           }
       },
     deleteOne: async (req, res) => {
-          const { _id } = req.params;
+          const _id = req.params.id;
         try{
-          const eventoDeleted = await models.Evento.findByIdAndDelete(_id);
+          const eventoDeleted = await models.Evento.findByIdAndDelete({_id});
           if(!eventoDeleted){
               return res.status(400).json({
                   mensaje: 'No se encontró el id indicado',
